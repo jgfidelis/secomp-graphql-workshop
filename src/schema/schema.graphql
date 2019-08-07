@@ -1,3 +1,11 @@
 type Query {
   helloWorld: String!
+  product(slug: String!): Product
+}
+
+type Product {
+  productId: String!
+  productName: String!
+  metaTagDescription: String!
+  teste: String
 }

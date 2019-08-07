@@ -11,8 +11,15 @@ interface Product {
   items: any[];
 }
 
-const http = async (url: string, headers: any = {}) => {
-  const fetchData = await fetch(url, { headers });
+const orderFormId = "bf9a4f0d64c448e4b1cfedd03b833d83";
+
+const http = async (
+  url: string,
+  headers: any = {},
+  method: string = "GET",
+  body?: any
+) => {
+  const fetchData = await fetch(url, { headers, method, body });
   return fetchData.json();
 };
 
@@ -26,6 +33,11 @@ const queries = {
       `http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/products/search/${slug}/p`
     );
     return results[0];
+  },
+  minicart: () => {
+    return http(
+      `http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/${orderFormId}?sc=1`
+    );
   }
 };
 
@@ -37,6 +49,15 @@ const itemResolvers = {
     imageUrl: (item: any) => {
       return item.images[0].imageUrl;
     }
+  }
+};
+
+const minicartResolvers = {
+  Minicart: {
+    itemCount: (orderForm: any) => {
+      return orderForm.items.length;
+    },
+    cacheId: (orderForm: any) => orderForm.orderFormId
   }
 };
 
@@ -64,11 +85,30 @@ const productResolvers = {
   }
 };
 
+const mutations = {
+  addItemToCart: (_: any, args: any, ctx: any) => {
+    const { itemId } = args;
+    const payload = {
+      orderItems: [{ id: itemId, quantity: 1, seller: "1" }]
+    };
+    return http(
+      `http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/${orderFormId}/items?sc=1`,
+      { "Content-Type": "application/json" },
+      "POST",
+      JSON.stringify(payload)
+    );
+  }
+};
+
 const resolverMap: IResolvers = {
   ...productResolvers,
   ...itemResolvers,
+  ...minicartResolvers,
   Query: {
     ...queries
+  },
+  Mutation: {
+    ...mutations
   }
 };
 export default resolverMap;

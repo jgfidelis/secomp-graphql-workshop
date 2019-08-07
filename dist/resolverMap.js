@@ -48,13 +48,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var fetch = require("node-fetch");
-var http = function (url, headers) {
+var orderFormId = "bf9a4f0d64c448e4b1cfedd03b833d83";
+var http = function (url, headers, method, body) {
     if (headers === void 0) { headers = {}; }
+    if (method === void 0) { method = "GET"; }
     return __awaiter(_this, void 0, void 0, function () {
         var fetchData;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4, fetch(url, { headers: headers })];
+                case 0: return [4, fetch(url, { headers: headers, method: method, body: body })];
                 case 1:
                     fetchData = _a.sent();
                     return [2, fetchData.json()];
@@ -78,7 +80,10 @@ var queries = {
                     return [2, results[0]];
             }
         });
-    }); }
+    }); },
+    minicart: function () {
+        return http("http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/" + orderFormId + "?sc=1");
+    }
 };
 var itemResolvers = {
     Item: {
@@ -88,6 +93,14 @@ var itemResolvers = {
         imageUrl: function (item) {
             return item.images[0].imageUrl;
         }
+    }
+};
+var minicartResolvers = {
+    Minicart: {
+        itemCount: function (orderForm) {
+            return orderForm.items.length;
+        },
+        cacheId: function (orderForm) { return orderForm.orderFormId; }
     }
 };
 var productResolvers = {
@@ -116,5 +129,14 @@ var productResolvers = {
         firstItem: function (product) { return product.items[0]; }
     }
 };
-var resolverMap = __assign({}, productResolvers, itemResolvers, { Query: __assign({}, queries) });
+var mutations = {
+    addItemToCart: function (_, args, ctx) {
+        var itemId = args.itemId;
+        var payload = {
+            orderItems: [{ id: itemId, quantity: 1, seller: "1" }]
+        };
+        return http("http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/" + orderFormId + "/items?sc=1", { "Content-Type": "application/json" }, "POST", JSON.stringify(payload));
+    }
+};
+var resolverMap = __assign({}, productResolvers, itemResolvers, minicartResolvers, { Query: __assign({}, queries), Mutation: __assign({}, mutations) });
 exports.default = resolverMap;

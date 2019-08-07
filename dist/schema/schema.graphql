@@ -1,6 +1,16 @@
 type Query {
   helloWorld: String!
   product(slug: String!): Product
+  minicart: Minicart
+}
+
+type Mutation {
+  addItemToCart(itemId: String!): Minicart
+}
+
+type Minicart {
+  cacheId: ID
+  itemCount: Int
 }
 
 type Product {
@@ -14,6 +24,6 @@ type Product {
 type Item {
   itemId: String
   nameComplete: String
-  price: Number
+  price: Float
   imageUrl: String
 }

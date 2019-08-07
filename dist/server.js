@@ -13,6 +13,6 @@ var server = new apollo_server_express_1.ApolloServer({
 });
 server.applyMiddleware({ app: app, path: "/graphql" });
 var httpServer = http_1.createServer(app);
-httpServer.listen({ port: 3000 }, function () {
+httpServer.listen({ port: 3001 }, function () {
     return console.log("\n GraphQL is now running on http://localhost:3000/graphql");
 });

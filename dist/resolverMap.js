@@ -115,7 +115,7 @@ var productResolvers = {
                         wholeTreeClean = wholeTreeDirty.slice(1).slice(0, -1);
                         ids = wholeTreeClean.split("/");
                         return [4, Promise.all(ids.map(function (id) {
-                                return http("http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/" + id, { "Content-Type": "application/json" });
+                                return http("http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/" + id);
                             }))];
                     case 1:
                         categories = _a.sent();
@@ -135,7 +135,7 @@ var mutations = {
         var payload = {
             orderItems: [{ id: itemId, quantity: 1, seller: "1" }]
         };
-        return http("http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/" + orderFormId + "/items?sc=1", { "Content-Type": "application/json" }, "POST", JSON.stringify(payload));
+        return http("http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/" + orderFormId + "/items?sc=1", "POST", JSON.stringify(payload));
     }
 };
 var resolverMap = __assign({}, productResolvers, itemResolvers, minicartResolvers, { Query: __assign({}, queries), Mutation: __assign({}, mutations) });

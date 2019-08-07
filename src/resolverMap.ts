@@ -57,7 +57,7 @@ const minicartResolvers = {
     itemCount: (orderForm: any) => {
       return orderForm.items.length;
     },
-    cacheId: (orderForm: any) => orderForm.orderFormId
+    id: (orderForm: any) => orderForm.orderFormId
   }
 };
 
@@ -74,8 +74,7 @@ const productResolvers = {
       const categories = await Promise.all(
         ids.map((id: string) => {
           return http(
-            `http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/${id}`,
-            { "Content-Type": "application/json" }
+            `http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/${id}`
           );
         })
       );
@@ -93,7 +92,7 @@ const mutations = {
     };
     return http(
       `http://boticario.vtexcommercestable.com.br/api/checkout/pub/orderForm/${orderFormId}/items?sc=1`,
-      { "Content-Type": "application/json" },
+      { Accept: "application/json", "Content-Type": "application/json" },
       "POST",
       JSON.stringify(payload)
     );

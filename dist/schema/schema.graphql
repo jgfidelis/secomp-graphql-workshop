@@ -7,5 +7,5 @@ type Product {
   productId: String!
   productName: String!
   metaTagDescription: String!
-  teste: String
+  categoryNames: [String!]
 }

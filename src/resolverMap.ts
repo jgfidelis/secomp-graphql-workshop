@@ -4,23 +4,50 @@ interface ProductArg {
   slug: string;
 }
 
+interface Product {
+  productId: string;
+  productName: string;
+  categoriesIds: string[];
+}
+
+const http = async (url: string, headers: any = {}) => {
+  const fetchData = await fetch(url, { headers });
+  return fetchData.json();
+};
+
 const queries = {
   helloWorld(_: void, args: void): string {
     return "Hello world!";
   },
   product: async (_: any, args: ProductArg) => {
     const { slug } = args;
-    const fetchData = await fetch(
+    const results = await http(
       `http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/products/search/${slug}/p`
     );
-    const results = await fetchData.json();
     return results[0];
   }
 };
 
 const productResolvers = {
   Product: {
-    teste: () => "hello"
+    categoryNames: async (product: Product) => {
+      const { categoriesIds } = product;
+
+      //Remove start and trailing /
+      const wholeTreeDirty = categoriesIds[0];
+      const wholeTreeClean = wholeTreeDirty.slice(1).slice(0, -1);
+      const ids = wholeTreeClean.split("/");
+
+      const categories = await Promise.all(
+        ids.map((id: string) => {
+          return http(
+            `http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/${id}`,
+            { "Content-Type": "application/json" }
+          );
+        })
+      );
+      return categories.map(({ name }) => name);
+    }
   }
 };
 

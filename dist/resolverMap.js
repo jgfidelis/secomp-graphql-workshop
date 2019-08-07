@@ -48,21 +48,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var fetch = require("node-fetch");
+var http = function (url, headers) {
+    if (headers === void 0) { headers = {}; }
+    return __awaiter(_this, void 0, void 0, function () {
+        var fetchData;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, fetch(url, { headers: headers })];
+                case 1:
+                    fetchData = _a.sent();
+                    return [2, fetchData.json()];
+            }
+        });
+    });
+};
 var queries = {
     helloWorld: function (_, args) {
         return "Hello world!";
     },
     product: function (_, args) { return __awaiter(_this, void 0, void 0, function () {
-        var slug, fetchData, results;
+        var slug, results;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     slug = args.slug;
-                    return [4, fetch("http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/products/search/" + slug + "/p")];
+                    return [4, http("http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/products/search/" + slug + "/p")];
                 case 1:
-                    fetchData = _a.sent();
-                    return [4, fetchData.json()];
-                case 2:
                     results = _a.sent();
                     return [2, results[0]];
             }
@@ -71,7 +82,29 @@ var queries = {
 };
 var productResolvers = {
     Product: {
-        teste: function () { return "hello"; }
+        categoryNames: function (product) { return __awaiter(_this, void 0, void 0, function () {
+            var categoriesIds, wholeTreeDirty, wholeTreeClean, ids, categories;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        categoriesIds = product.categoriesIds;
+                        wholeTreeDirty = categoriesIds[0];
+                        wholeTreeClean = wholeTreeDirty.slice(1).slice(0, -1);
+                        ids = wholeTreeClean.split("/");
+                        console.log("teste ids: ", ids);
+                        return [4, Promise.all(ids.map(function (id) {
+                                return http("http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/" + id, { "Content-Type": "application/json" });
+                            }))];
+                    case 1:
+                        categories = _a.sent();
+                        console.log("teste categories: ", categories);
+                        return [2, categories.map(function (_a) {
+                                var name = _a.name;
+                                return name;
+                            })];
+                }
+            });
+        }); }
     }
 };
 var resolverMap = __assign({}, productResolvers, { Query: __assign({}, queries) });

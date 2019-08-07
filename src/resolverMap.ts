@@ -8,6 +8,7 @@ interface Product {
   productId: string;
   productName: string;
   categoriesIds: string[];
+  items: any[];
 }
 
 const http = async (url: string, headers: any = {}) => {
@@ -25,6 +26,17 @@ const queries = {
       `http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/products/search/${slug}/p`
     );
     return results[0];
+  }
+};
+
+const itemResolvers = {
+  Item: {
+    price: (item: any) => {
+      return item.sellers[0].commertialOffer.Price;
+    },
+    imageUrl: (item: any) => {
+      return item.images[0].imageUrl;
+    }
   }
 };
 
@@ -47,12 +59,14 @@ const productResolvers = {
         })
       );
       return categories.map(({ name }) => name);
-    }
+    },
+    firstItem: (product: Product) => product.items[0]
   }
 };
 
 const resolverMap: IResolvers = {
   ...productResolvers,
+  ...itemResolvers,
   Query: {
     ...queries
   }

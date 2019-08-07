@@ -80,6 +80,16 @@ var queries = {
         });
     }); }
 };
+var itemResolvers = {
+    Item: {
+        price: function (item) {
+            return item.sellers[0].commertialOffer.Price;
+        },
+        imageUrl: function (item) {
+            return item.images[0].imageUrl;
+        }
+    }
+};
 var productResolvers = {
     Product: {
         categoryNames: function (product) { return __awaiter(_this, void 0, void 0, function () {
@@ -91,21 +101,20 @@ var productResolvers = {
                         wholeTreeDirty = categoriesIds[0];
                         wholeTreeClean = wholeTreeDirty.slice(1).slice(0, -1);
                         ids = wholeTreeClean.split("/");
-                        console.log("teste ids: ", ids);
                         return [4, Promise.all(ids.map(function (id) {
                                 return http("http://boticario.vtexcommercestable.com.br/api/catalog_system/pub/category/" + id, { "Content-Type": "application/json" });
                             }))];
                     case 1:
                         categories = _a.sent();
-                        console.log("teste categories: ", categories);
                         return [2, categories.map(function (_a) {
                                 var name = _a.name;
                                 return name;
                             })];
                 }
             });
-        }); }
+        }); },
+        firstItem: function (product) { return product.items[0]; }
     }
 };
-var resolverMap = __assign({}, productResolvers, { Query: __assign({}, queries) });
+var resolverMap = __assign({}, productResolvers, itemResolvers, { Query: __assign({}, queries) });
 exports.default = resolverMap;
